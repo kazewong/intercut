@@ -11,15 +11,15 @@ The following files are needed as the input of the program:
 
 The format of the noise file should follow:
 
-(without radial dependent noise)
+           (without radial dependent noise)
 
-wavelength 			      noise
+ 	wavelength			noise
 
-(with radial dependent noise)
+            (with radial dependent noise)
 
 				radius of the object
 
-wavelength			       noise
+	wavelength			noise
 
 
 - A parameter file, specifying the name and the wavelength of the lines. Please ensure if the name of lines is same as the name in the catalogue. Note that the first row is reserved for the main line, please enter the parameter of your main line there, the order of the rest does not matter.
