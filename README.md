@@ -7,8 +7,7 @@ The use this program, the following package needed to be installed:
 
 The following files are needed as the input of the program:
 
-- A noise file,specifying the noise correspoding to a specific wavelength. If radial dependent noise is needed, please set the first value of flags to be 1
-
+- A noise file,specifying the noise correspoding to a specific wavelength. If radial dependent noise is needed, please set the first value of flags to be 1.
 The format of the noise file should follow:
 
            (without radial dependent noise)
@@ -39,17 +38,29 @@ The way to use the control script:
 each row of the control script should have two component, the first component specify what kind of argument it is, and the second argument is the argument itself,please seperate the two components by ;
 
 flag: on/off switch for random fluctuation and radial dependent noise
-catalog: input catalogue
-noise: input noise
-lines: lines paramter file
-output: desired output text file
-loopNumber: simluation number, the second line identification part can be looped for multiple times, which the flux should be affected by random fluuctuation
-binNumber: output histogram bin number
-lowerLim: output histogram lower x limit
-upperLim: output histogram upper x limit
-photocut: photometric cut for the whole survey
-condition: condition file
-noisepara: this is needed only when radial noise is needed, the first 3 arguments are the range and bin of wavelength, and the last 3 arguments are range and bin of radius of the object.
 
+catalog: input catalogue
+
+noise: input noise
+
+lines: lines paramter file
+
+output: desired output text file
+
+loopNumber: simluation number, the second line identification part can be looped for multiple times, which the flux should be 
+affected by random fluuctuation
+
+binNumber: output histogram bin number
+
+lowerLim: output histogram lower x limit
+
+upperLim: output histogram upper x limit
+
+photocut: photometric cut for the whole survey
+
+condition: condition file
+
+noisepara: this is needed only when radial noise is needed, the first 3 arguments are the range and bin of wavelength, and the 
+last 3 arguments are range and bin of radius of the object.
 
 
