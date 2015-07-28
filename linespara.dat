@@ -1,0 +1,8 @@
+OII,3727.,np.where(~((z<0.92)*((lineA[3].flux)<(4*lineA[3].noise))))[0]
+OIIIa,4959.,np.where((z>(7156./lineA[j].wavelength -1.))*(lineA[0].flux<(4*lineA[0].noise)))[0]
+OIIIb,5007.,np.where(z>(7156./lineA[j].wavelength -1.)*(lineA[0].flux<(4*lineA[0].noise)))[0]
+Ha,6563.,np.where(z>(7156./lineA[j].wavelength -1.)*(lineA[0].flux<(4*lineA[0].noise)*((lineA[2].flux)<(4*lineA[2].noise))))[0]
+SIIa,6717.,np.where(z>(7156./lineA[j].wavelength -1.)*((lineA[3].flux)<(4*lineA[3].noise)))[0]
+SIIb,6731.,np.where((z>(7156./lineA[j].wavelength -1.))*((lineA[3].flux)<(4*lineA[3].noise)))[0]
+Hb,4861.,np.where(z>(7156./lineA[j].wavelength -1.)*(lineA[0].flux<(4*lineA[0].noise))*(~((z<0.92)*(lineA[3].flux)<(4*lineA[3].noise))))[0]
+NII,6563.,np.where(z>(7156./lineA[j].wavelength -1.)*(lineA[0].flux<(4*lineA[0].noise)*((lineA[2].flux)<(4*lineA[2].noise))))[0]
