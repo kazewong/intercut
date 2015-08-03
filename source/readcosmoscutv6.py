@@ -129,54 +129,16 @@ for i in range((it[0].size/it[0].ndim)):
 	lumO3a[i] = (lineA[name[1]].flux[it[0][i]])*4*pi*dl[i]**2
 	lumO3b[i] = (lineA[name[2]].flux[it[0][i]])*4*pi*dl[i]**2
 
-
-#logl1 = 35 +np.arange(134.)*0.1
-#y = np.genfromtxt('shiftl_ha_colbert.dat')
 lumHa2 = [0. for x in range((it[0].size/it[0].ndim))]
 lumHa2 = LuminosityFunction.CalibrationHa(z,lumHa,it)
-#for i in range((it[0].size/it[0].ndim)-1):
-#	iz = int(np.around(10*z[it[0][i]]))
-#
-#	if iz <= 60:
-#		lumHa2[i] = np.interp(np.log10(lumHa[i]),logl1,y[iz])     
-#	else:
-#		lumHa2[i] = np.log10(lumHa[i])
-
-
-#for i in range (0,len(lumHa2)):
 lumHa2 = np.power(10,lumHa2)#*1.4
 lineA[name[0]].flux = [-9999 for x in range((z.size/z.ndim))]
 
 for i in range((it[0].size/it[0].ndim)):
         lineA[name[0]].flux[it[0][i]] = (float(lumHa2[i])/(4*pi*(dl[i]**2)))
 
-#******************************* DEBUG SECTION******************************8
-
-#print 'fha2','z+1','fha','nha'
-#for i in range(20):
-	
-#	print (lumHa2[i]/(4*pi*(dl[i]**2))),(z[i]+1),lineA[3].data[0][it[0][i]],lineA[3].noise[it[0][i]]
-#	if lineA[3].data[0][it[0][i]] == debug[it[0][i]] : print i
-
-#for i in range(it[0].size/it[0].ndim-1) :
-#	if lineA[3].data[0][i] == debug[i]:print i
-#for i in range(20):
-#	print lineA[3].data[0][i]
-#	print lumHa2[i]
-                                                       
-#****************************END OF DEBUG SECTION***************************************
-
-#logl1 = 34 +np.arange(141.)*0.1
-#y = np.genfromtxt('shiftl_o3_colbert_ha_geach.dat')
 lumO3b2 = [0 for x in range((it[0].size/it[0].ndim))]
 lumO3b2 = LuminosityFunction.CalibrationO3b(z,lumO3b,it)
-#for i in range((it[0].size/it[0].ndim)-1):	
-#        iz = int(np.around(10*z[it[0][i]]))
-#        if iz <= 60:
-#                        lumO3b2[i] = np.interp(np.log10(lumHa[i]),logl1,y[iz])
-#        else:
-#                        lumO3b2[i] = np.log10(lumO3b[i])
-
 lumO3b2 = np.power(10,lumO3b2)
 lineA[name[2]].flux = [-9999 for x in range((z.size/z.ndim))]
 for i in range((it[0].size/it[0].ndim-1)):
@@ -248,9 +210,8 @@ for i in range(parameter[0]):
 			if j ==0:print lineA[j].wavelength,lineA[0].wavelength,(1+z[lineA[j].intf])-1,z[lineA[j].intf]
 		else:
 			hlocal =np.array(np.histogram(0,bins = parameter[1], range = (parameter[2],parameter[3]))[0])
-#			print 'WARNING:interloper fraction from'+lineA[j].name+'returns NULL'
+			print 'WARNING:interloper fraction from'+lineA[j].name+'returns NULL'
 		lineA[j].fraction[i] = np.divide(hlocal,hO2)
-#		if j ==2:print hO2,hlocal,lineA[j].fraction
 
 
 
@@ -260,7 +221,6 @@ for i in range(len(lineA)):
 	lineA[i].mean = np.array([0. for j in range(parameter[1])])
 	lineA[i].sd = np.array([0. for j in range(parameter[1])])
 	lineA[i].fraction = np.divide(lineA[i].fraction,(lineA[i].fraction+1.))
-#	if i ==2: print lineA[i].fraction,lineA[i].fraction+1.
 	for j in range(parameter[1]):
 			lineA[i].mean[j] = np.mean(lineA[i].fraction[j])
 			lineA[i].sd[j] = np.std(lineA[i].fraction[j])
@@ -281,18 +241,3 @@ for i in range(len(lineA)):
 output.close()
 
 
-
-
-#output = TFile(outputname,'RECREATE')
-
-#for i in range(len(lineA)):
-#	localfra = TH1F(lineA[i].name+'fraction',lineA[i].name+'fraction',parameter[1],parameter[2],parameter[3])
-#	for j in range(parameter[1]):
-#		localfra.SetBinContent(j+1,lineA[i].mean[j])
-#		localfra.SetBinError(j+1,lineA[i].sd[j])
-#	output.Write()
-#output.Close()
-
-#**********************************************END OF PROGRAM
-#	plt.hist((lineA[i].wavelength/3727.)*(1+z[lineA[i].intf])-1,bins=16)
-#	plt.show()

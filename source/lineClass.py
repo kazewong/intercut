@@ -11,25 +11,30 @@ class line:
 	Lambda = np.array([],dtype=float)
 	noise = np.array([],dtype=float)
 	intf = np.array([],dtype=float)
-	fraction = np.array([[]],dtype=float)
+	fraction = []
 	origin = np.array([],dtype=float)
 	mean = np.array([],dtype=float)
 	sd = np.array([],dtype=float)
 	condition = np.array([],dtype=float)
-	photomCutForInt = np.array([],dtype=str)	
+	
 	def selection(self,condition):
 		local = np.where(condition)[0]
 		self.intf = np.intersect1d(local,self.intf)
 
 	def conditionalSelection(self,condition,selection):
-		print self.intf.size
 		leftover = np.intersect1d(self.intf,np.where(condition*selection)[0])
-		print leftover.size
 		self.intf = np.intersect1d(self.intf,np.where(~(condition))[0])
-		print self.intf.size
 		self.intf = np.append(self.intf,leftover)
 		self.intf.sort() 
-		print self.intf.size
+		
+	def getStat(self):
+		self.fraction = self.fraction.T
+		self.mean = np.array([0. for i in range(self.fraction.shape[0])])
+		self.sd = np.array([0. for i in range(self.fraction.shape[0])])
+		self.fraction = np.divide(self.fraction,(self.fraction+1.))
+		for i in range(self.fraction.shape[0]):
+			self.mean[i] = np.mean(self.fraction[i])
+			self.sd[i] = np.std(self.fraction[i])
 	
 	
 class photocut:
