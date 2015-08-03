@@ -238,9 +238,9 @@ for i in range(parameter[0]):
 				noise = lineDict[eval(lineA[j].condition[j2])[1]].noise	
 				wavelength = lineDict[eval(lineA[j].condition[j2])[1]].wavelength
 				lineA[j].selection(eval(lineA[j].condition[j2])[2])
-				if eval(lineA[j].condition[j2])[0] =='conditional':
-					zd = (lineA[j].wavelength/lineDict[eval(lineA[j].condition[j2])[1]].wavelength)*(1+z)-1.
-					lineA[j].conditionalSelection(eval(lineA[j].condition[j2])[2],eval(lineA[j].condition[j2])[3])
+			if eval(lineA[j].condition[j2])[0] =='conditional':
+				zd = (lineA[j].wavelength/lineDict[eval(lineA[j].condition[j2])[1]].wavelength)*(1+z)-1.
+				lineA[j].conditionalSelection(eval(lineA[j].condition[j2])[2],eval(lineA[j].condition[j2])[3])
 	
 		hO2 = np.array(np.histogram(z[lineA[0].intf],bins = parameter[1],range = (parameter[2],parameter[3]))[0],dtype=float)
 		if lineA[j].intf != []:

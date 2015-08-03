@@ -57,7 +57,6 @@ def CalibrationHa(z,oldLum,it):
 	newLF = np.array([[0.for i in range(50)] for i in range(50)])
 	for i in range(50):
 		for j in range(50):
-			print grid[1][i],grid[0][j],luminosityParameter(grid[1][i])
 	        	newLF[i][j]= optimize.brenth(rootfinding,30,50,args=(luminosityParameter(grid[1][i]),np.power(10,grid[0][j])))
 	localinterp = interpolate.interp2d(grid[0],grid[1],newLF,fill_value=0.0)
 	for i in range(oldLF.size):
