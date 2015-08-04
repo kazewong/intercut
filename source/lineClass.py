@@ -11,7 +11,7 @@ class line:
 	Lambda = np.array([],dtype=float)
 	noise = np.array([],dtype=float)
 	intf = np.array([],dtype=float)
-	fraction = []
+	fraction = np.array([[]],dtype=float)
 	origin = np.array([],dtype=float)
 	mean = np.array([],dtype=float)
 	sd = np.array([],dtype=float)
