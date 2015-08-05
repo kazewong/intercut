@@ -34,12 +34,15 @@ def lineFluxPertubation(lines,threshold):
 		ferr = np.random.normal(size = lines[lineObject][lines[lineObject].noise<threshold].size)
 		lines[lineObject][lines[lineObject].noise<threshold].flux = lines[lineObject][lines[lineObject].noise<threshold].origin + lines[lineObject][lines[lineObject].noise<threshold].noise*ferr
 		
-def getFraction(lines,z,ranges,bin = 10):
-	mainLine = lines[lines.items()[0][0]]
+def getFraction(lines,mainLineName,z,ranges,bin = 10):
+	mainLine = lines[mainLineName]
+	print mainLine.name, mainLine.intf
 	hmain = np.array(np.histogram(z[mainLine.intf],bins = bin,range = ranges)[0],dtype = float)
+	print mainLine.name,hmain
 	for lineObject in lines:
 		if lines[lineObject] !=[]:
-			hlocal = np.array(np.histogram((lines[lineObject].wavelength/lines[lines.items()[0][0]].wavelength)*(1+(z[lines[lineObject].intf]))-1)[0])
+			hlocal = np.array(np.histogram((lines[lineObject].wavelength/mainLine.wavelength)*(1+(z[lines[lineObject].intf]))-1,bins = bin,range = ranges)[0])
+			print lines[lineObject].name,hlocal
 		else:
 			hlocal = np.array(np.histogram(0,bins =bin,range = ranges)[0])
 		lines[lineObject].fraction = np.append(lines[lineObject].fraction,np.divide(hlocal,hmain))

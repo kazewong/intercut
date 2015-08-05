@@ -4,7 +4,7 @@ from astropy.io import fits
 from scipy import interpolate
 from scipy import optimize
 import math
-import LuminosityFunction
+from LuminosityFunction import *
 from CuttingFunction import *
 
 fileio = np.genfromtxt('fileiov6.dat',dtype = "S200",delimiter = ';')
@@ -105,52 +105,23 @@ print 'the output file is going to be '+str(outputname)
 print 'the simulation number is '+str(parameter[0])
 print 'the lines input are ' + str(len(lineA))
 print 'the entries number is '+str(z.size)
-
 #****************************************CALIBRATING SECTION********************************
 #this part calibrate the catalogue 'CMC081211',only Ha,O3a and O3b need calibration 
 
-# name = [0,0,0]
-# for namematch in range(len(lineA)):
-# 	if lineA[namematch].name == 'Ha':name[0] = namematch
-# 	if lineA[namematch].name == 'OIIIa':name[1] = namematch
-# 	if lineA[namematch].name == 'OIIIb':name[2] = namematch
-# 
-# 
-# it = np.array(np.where(lineA[name[0]].flux > 0.0))
-# dl = [0 for x in range((it[0].size/it[0].ndim))]
-# lumHa =[0 for x in range((it[0].size/it[0].ndim))]
-# lumO3a =[0 for x in range((it[0].size/it[0].ndim))]
-# lumO3b =[0 for x in range((it[0].size/it[0].ndim))]
-# 
-# 
-# 
-# for i in range((it[0].size/it[0].ndim)):
-# 	dl[i] = (10.**((0.2*dmz[it[0][i]])+1))*(3.09e18)
-# 	lumHa[i] = (lineA[name[0]].flux[it[0][i]])*4*pi*dl[i]**2
-# 	lumO3a[i] = (lineA[name[1]].flux[it[0][i]])*4*pi*dl[i]**2
-# 	lumO3b[i] = (lineA[name[2]].flux[it[0][i]])*4*pi*dl[i]**2
-# 
-# lumHa2 = [0. for x in range((it[0].size/it[0].ndim))]
-# lumHa2 = LuminosityFunction.CalibrationHa(z,lumHa,it)
-# lumHa2 = np.power(10,lumHa2)#*1.4
-# lineA[name[0]].flux = [-9999 for x in range((z.size/z.ndim))]
-# 
-# for i in range((it[0].size/it[0].ndim)):
-#         lineA[name[0]].flux[it[0][i]] = (float(lumHa2[i])/(4*pi*(dl[i]**2)))
-# 
-# lumO3b2 = [0 for x in range((it[0].size/it[0].ndim))]
-# lumO3b2 = LuminosityFunction.CalibrationO3b(z,lumO3b,it)
-# lumO3b2 = np.power(10,lumO3b2)
-# lineA[name[2]].flux = [-9999 for x in range((z.size/z.ndim))]
-# for i in range((it[0].size/it[0].ndim-1)):
-#         lineA[name[2]].flux[it[0][i]] = lumO3b2[i]/(4*pi*(dl[i]**2))
-# 
-# kO3b=4.05+2.659*(-2.156+1.509/.5007-0.198/(.5007**2)+0.011/(.5007**3))
-# kO3a=4.05+2.659*(-2.156+1.509/.4959-0.198/(.4959**2)+0.011/(.4959**3))
-# 
-# for i in range (len(lineA[2].flux)):
-#         lineA[name[1]].flux[i]=((lineA[name[2]].flux[i]*(10.**(0.4*ebv[i]*kO3b))/3.)*(10.**(-0.4*ebv[i]*kO3a)))
-# 
+kO3b=4.05+2.659*(-2.156+1.509/.5007-0.198/(.5007**2)+0.011/(.5007**3))
+kO3a=4.05+2.659*(-2.156+1.509/.4959-0.198/(.4959**2)+0.011/(.4959**3))
+it = np.array(np.where(lineDict['Ha'].flux>0)[0])
+dl =np.array(10.**(0.2*dmz[it]+1)*3.09e18,dtype = 'float64')
+lumHa = lineDict['Ha'].flux[it]*4*pi*dl**2
+lumO3a = lineDict['OIIIa'].flux[it]*4*pi*dl**2
+lumO3b = lineDict['OIIIb'].flux[it]*4*pi*dl**2
+lumHa2 = np.array(CalibrationHa(z,lumHa,it))
+lumO3b2 = np.array(CalibrationO3b(z,lumO3b,it))
+lineDict['Ha'].flux =  np.array([-9999. for x in range(z.size)])
+lineDict['OIIIb'].flux =  np.array([-9999. for x in range(z.size)])
+lineDict['Ha'].flux[it] = lumHa2.astype('float64')/(4.*pi*dl**2.) 
+lineDict['OIIIb'].flux[it] = lumO3b2.astype('float')/(4*pi*dl**2) 
+lineDict['OIIIa'].flux[it] = (lineDict['OIIIb'].flux*(10.**(0.4*ebv*kO3b))/3.)*(10.**(-0.4*ebv*kO3a))
 
 #****************************END OF CALIBRATION******************************
 
@@ -189,11 +160,11 @@ for i in range(parameter[0]):
 #this part evaluates the second line cutting condition and return the result as histogram
 
 	secondLineCutting(lineDict,field)
-	getFraction(lineDict,z,(0.8,2.4))
+	getFraction(lineDict,'OII',z,(1,2))
 
 for lineObject in lineDict:
 	lineDict[lineObject].fraction = np.array(lineDict[lineObject].fraction)
-	lineDict[lineObject].fraction.reshape(lineDict[lineObject].fraction.size/parameter[1],parameter[1])
+	lineDict[lineObject].fraction = lineDict[lineObject].fraction.reshape(lineDict[lineObject].fraction.size/parameter[1],parameter[1])
 	lineDict[lineObject].getStat()
 
 #*************************************END OF SECOND LINE IDENTIFICATION SECTION******************************

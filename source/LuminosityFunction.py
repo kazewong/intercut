@@ -35,14 +35,14 @@ def rootfinding(luminosity,luminosityParameter,nold):
 	return luminosityParameter[0][0]*float(mpmath.gammainc(luminosityParameter[2][0]+1,np.power(10,luminosity)/luminosityParameter[1][0]))-nold
 
 def CalibrationHa(z,oldLum,it):
-	newLum = [0. for x in range((it[0].size/it[0].ndim))]
-	oldpara = np.array([[0. for i in range(3)] for i in range(it[0].size/it[0].ndim)])
-	oldLF = np.array([0. for i in range(it[0].size/it[0].ndim)])
+	newLum = [0. for x in range((it.size/it.ndim))]
+	oldpara = np.array([[0. for i in range(3)] for i in range(it.size/it.ndim)])
+	oldLF = np.array([0. for i in range(it.size/it.ndim)])
 	for i in range(oldpara.shape[0]):
 	        oldpara[i][0] = 1.37e-3
 	        oldpara[i][2] = -1.35
-	        if z[it[0][i]] <1.3 :oldpara[i][1] = 5.1e41*np.power((1+z[it[0][i]]),3.1)
-	        if z[it[0][i]] >=1.3:oldpara[i][1] =6.8e42
+	        if z[it[i]] <1.3 :oldpara[i][1] = 5.1e41*np.power((1+z[it[i]]),3.1)
+	        if z[it[i]] >=1.3:oldpara[i][1] =6.8e42
 	        oldLF[i] = LuminosityFunction(oldpara[i],oldLum[i])
 	rangea = oldLF.copy()
 	rangea.sort()
@@ -60,18 +60,20 @@ def CalibrationHa(z,oldLum,it):
 	        	newLF[i][j]= optimize.brenth(rootfinding,30,50,args=(luminosityParameter(grid[1][i]),np.power(10,grid[0][j])))
 	localinterp = interpolate.interp2d(grid[0],grid[1],newLF,fill_value=0.0)
 	for i in range(oldLF.size):
-		newLum[i]=float(localinterp(np.log10(oldLF[i]),z[it[0][i]]))
+		newLum[i]=float(localinterp(np.log10(oldLF[i]),z[it[i]]))
+	newLum= np.power(10.,newLum)
+	
 	return newLum
 
 def CalibrationO3b(z,oldLum,it):
-	newLum = [0. for x in range((it[0].size/it[0].ndim))]
-	oldpara = np.array([[0. for i in range(3)] for i in range(it[0].size/it[0].ndim)])
-	oldLF = np.array([0. for i in range(it[0].size/it[0].ndim)])
+	newLum = [0. for x in range((it.size/it.ndim))]
+	oldpara = np.array([[0. for i in range(3)] for i in range(it.size/it.ndim)])
+	oldLF = np.array([0. for i in range(it.size/it.ndim)])
 	for i in range(oldpara.shape[0]):
 	        oldpara[i][0] = 1.37e-3
 	        oldpara[i][2] = -1.35
-	        if z[it[0][i]] <1.3 :oldpara[i][1] = 5.1e41*np.power((1+z[it[0][i]]),3.1)
-	        if z[it[0][i]] >=1.3:oldpara[i][1] =6.8e42
+	        if z[it[i]] <1.3 :oldpara[i][1] = 5.1e41*np.power((1+z[it[i]]),3.1)
+	        if z[it[i]] >=1.3:oldpara[i][1] =6.8e42
 	        oldLF[i] = LuminosityFunction(oldpara[i],oldLum[i])
 	rangea = oldLF.copy()
 	rangea.sort()
@@ -90,5 +92,5 @@ def CalibrationO3b(z,oldLum,it):
 	        	newLF[i][j]= optimize.brenth(rootfinding,30,50,args=(luminosityParameter(grid[1][i]),np.power(10,grid[0][j])))
 	localinterp = interpolate.interp2d(grid[0],grid[1],newLF,fill_value=0.0)
 	for i in range(oldLF.size):
-		newLum[i]=float(localinterp(np.log10(oldLF[i]),z[it[0][i]]))
+		newLum[i]=float(localinterp(np.log10(oldLF[i]),z[it[i]]))
 	return newLum
