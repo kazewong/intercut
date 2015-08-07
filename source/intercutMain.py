@@ -8,9 +8,8 @@ from LuminosityFunction import *
 from CuttingFunction import *
 
 fileio = np.genfromtxt('fileiov6.dat',dtype = "S200",delimiter = ';')
-noiseA = []
-lineA = []
 field = []
+lineDict={}
 parameter = [0,0,0,0]
 zd = np.array([])
 flux = np.array([])
@@ -49,42 +48,9 @@ for linenumber in range(fileio.size/fileio.ndim):
 		mz = field[11].mag
 		pi = 3.1415926
 	if fileio[linenumber][0] == 'noise':
-		noiseA.append(np.genfromtxt(fileio[linenumber][1]).transpose())# remember to change the noise data format
+		noise = np.genfromtxt(fileio[linenumber][1]).transpose()# remember to change the noise data format
 	if fileio[linenumber][0] == 'lines':
-		datfile = np.genfromtxt(fileio[linenumber][1],dtype = "S20,float",delimiter = ';')
-		lineA = ([0 for i in range(datfile.size/datfile.ndim)])
-		lineDict = {}
-		for i in range(datfile.size/datfile.ndim):
-			lineA[i] = lc.line(datfile[i][0],datfile[i][1])
-			lineA[i].flux = np.array(table.field('Flux_'+lineA[i].name))
-			lineA[i].Lambda = np.array(table.field('Lambda_'+lineA[i].name))
-			if flags[0] == 1:
-				row = []
-				column = []
-				for linenumber2 in range(fileio.size/fileio.ndim):	
-					if fileio[linenumber2][0] == 'noisepara':
-						localpara = eval(fileio[linenumber2][1])
-						row = np.ogrid[localpara[0]:localpara[1]:localpara[2]]
-						column = np.ogrid[localpara[3]:localpara[4]:localpara[5]]	
-				localinterp = interpolate.interp2d(row,column,noiseA[0],fill_value = 1.)
-				localx = (((lineA[i].wavelength)*(1+z)))
-				localy = np.array(radius*0.03)	
-				lineA[i].noise = np.array([0. for j in range(lineA[i].flux.size)])
-				for j in range(lineA[i].noise.size):
-					lineA[i].noise[j] = localinterp(localx[j],localy[j])[0]
-			else:
-					lineA[i].noise = np.interp(lineA[i].wavelength*(1+z),noiseA[0][0],noiseA[0][1])#the firsxt column is the observed wavelength and the second column is the noise
-	
-#				if i == 0:lineA[i].noise = np.interp(z,noiseA[1][0],noiseA[1][1])
-#				else :lineA[i].noise = np.interp(lineA[i].wavelength*(1+z),(noiseA[0][0]+1)*lineA[0].wavelength,noiseA[0][1])
-			for linenumber2 in range(fileio.size/fileio.ndim):	
-				if fileio[linenumber2][0] == 'condition':
-					condition = np.genfromtxt(fileio[linenumber2][1],dtype = "S20,S500",delimiter = ';')
-					for i2 in range(condition.size/condition.ndim):
-						if condition[i2][0] == lineA[i].name:
-							lineA[i].condition = np.append(lineA[i].condition,condition[i2][1])
-					lineA[i].condition = np.array(lineA[i].condition)
-			lineDict[lineA[i].name]=lineA[i]
+		lineDict[eval(fileio[linenumber][1])[0]] = lc.line(eval(fileio[linenumber][1])[0],eval(fileio[linenumber][1])[1])
 	if fileio[linenumber][0] == 'loopNumber':
 		parameter[0] = eval(fileio[linenumber][1])
 	if fileio[linenumber][0] == 'binNumber':
@@ -99,11 +65,29 @@ for linenumber in range(fileio.size/fileio.ndim):
 		photocut = fileio[linenumber][1]
 	if fileio[linenumber][0] == 'flags':
 		flags = eval(fileio[linenumber][1])
-
+		
+for line in lineDict:
+	lineDict[line].flux = np.array(table.field('Flux_'+lineDict[line].name))
+	lineDict[line].Lambda = np.array(table.field('Lambda_'+lineDict[line].name))
+	for io in fileio:
+		if io[0] == 'noisepara' and flags[0] == 1:
+			localpara = eval(io[1])
+			dataPoint = np.array([(lineDict[line].wavelength*(1+z)),np.array(radius*0.03)])
+			grid = np.meshgrid(np.ogrid[localpara[0]:localpara[1]:localpara[2]],np.ogrid[localpara[3]:localpara[4]:localpara[5]])[0]
+			lineDict[line].noise = interpolate.griddata(grid,noise,datapoint,fill_value = 1.)
+		if io[0] == 'noisepara' and flags[0] == 0:
+			lineDict[line].noise = np.interp(lineDict[line].wavelength*(1+z),noise[0],noise[1])
+		if io[0] == 'condition':
+			conditions = np.genfromtxt(io[1],dtype = 'S20,S500',delimiter = ';')
+			for condition in conditions:
+				if condition[0]==lineDict[line].name:
+					lineDict[line].condition = np.append(lineDict[line].condition,condition[1])
+			lineDict[line].condition = np.array(lineDict[line].condition)
+	
 #*****************************END OF IO SECTION**************************************
 print 'the output file is going to be '+str(outputname)
 print 'the simulation number is '+str(parameter[0])
-print 'the lines input are ' + str(len(lineA))
+print 'the lines input are ' + str(len(lineDict))
 print 'the entries number is '+str(z.size)
 #****************************************CALIBRATING SECTION********************************
 #this part calibrate the catalogue 'CMC081211',only Ha,O3a and O3b need calibration 
@@ -127,11 +111,11 @@ lineDict['OIIIa'].flux[it] = (lineDict['OIIIb'].flux*(10.**(0.4*ebv*kO3b))/3.)*(
 
 #****************************RANDOM FLUCTUATION SECTION**********************
 #this section perturb the flux of the spectral lines and photometric cut
-for i in range(len(lineA)):
-	lineA[i].flux = np.array(lineA[i].flux)
-	lineA[i].origin = lineA[i].flux.copy()
+for i in lineDict:
+	lineDict[i].flux = np.array(lineDict[i].flux)
+	lineDict[i].origin = lineDict[i].flux.copy()
 if flags[1] == 1:
-	ferr = np.random.normal(size = [parameter[0],len(lineA),lineA[0].flux.size])
+	ferr = np.random.normal(size = [parameter[0],len(lineDict),lineDict[0].flux.size])
 	photoerr = np.random.normal(size = [len(field),z.size])
 	for i in range(6,len(field)):
 		fcut = np.power(10,-0.4*(56+1.+48.6))
@@ -171,13 +155,13 @@ for lineObject in lineDict:
 
 #***********************************************PLOTTING SECTION*********************************************
 output = open(outputname,'w')
-for i in range(len(lineA)):
+for i in lineDict:
 	for j in range(parameter[1]):
-		output.write(str(lineA[i].mean[j])+'\t')
+		output.write(str(lineDict[i].mean[j])+'\t')
 	output.write('\n')
 	
 	for j in range(parameter[1]):
-		output.write(str(lineA[i].sd[j])+'\t')
+		output.write(str(lineDict[i].sd[j])+'\t')
 	output.write('\n')
 	
 
