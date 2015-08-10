@@ -83,6 +83,9 @@ for line in lineDict:
 				if condition[0]==lineDict[line].name:
 					lineDict[line].condition = np.append(lineDict[line].condition,condition[1])
 			lineDict[line].condition = np.array(lineDict[line].condition)
+			
+O2noise = np.genfromtxt('noiseO2a2.dat').T
+lineDict['OII'].noise = np.interp(lineDict['OII'].wavelength*(1+z),O2noise[0],O2noise[1])
 	
 #*****************************END OF IO SECTION**************************************
 print 'the output file is going to be '+str(outputname)
@@ -134,6 +137,7 @@ for i in range(parameter[0]):
 	for lineObject in lineDict:
 		lineDict[lineObject].flux = lineDict[lineObject].origin.copy()
 		lineDict[lineObject].intf = np.arange(lineDict[lineObject].flux.size)
+		if photocut != '':lineDict[lineObject].selection(eval(photocut))
 	if flags[1]==1:	
 		lineFluxPertubation(lineDict,1e-5)
 #********************************END OF RANDOM FLUCTUATION SECTION*******************
