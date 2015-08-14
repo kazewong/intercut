@@ -14,7 +14,7 @@ from scipy import optimize
 
 #CalibrationHa and CalibrationO3b are the desired luminosity functions.
 
-def luminosityParameter(z):
+def luminosityParameterHa(z):
 	bin1 = np.array([[0.6],[-2.51,41.72,-1.27]])
 	bin2 = np.array([[1.2],[-2.7,42.18,-1.43]])
 	output = np.array([[0. for i in range(z.size)] for i in range(3)])
@@ -27,6 +27,20 @@ def luminosityParameter(z):
 	output[0] = np.power(10,output[0])
 	output[1] = np.power(10,output[1])
 	return output
+	
+def luminosityParameterO3b(z):
+	bin1 = np.array([[0.9],[-3.28,42.39,-1.5]])
+	bin2 = np.array([[1.8],[-3.60,42.83,-1.5]])
+	output = np.array([[0. for i in range(z.size)] for i in range(3)])
+	binsize = bin2[0][0] - bin1[0][0]
+	for i in range(3):
+		slope = (bin2[1][i]-bin1[1][i])/binsize
+		output[i][np.where(z<bin1[0][0]-binsize/2)[0]] = bin1[1][i] - (slope *binsize/2)
+		output[i][np.where((z>=bin1[0][0]-binsize/2)*(z<= bin2[0][0]+binsize/2))[0]] = bin1[1][i]+slope*(z-(bin1[0][0]-binsize/2))
+		output[i][np.where(z>bin2[0][0]+binsize/2)[0]] = bin2[1][i]+slope*binsize/2
+	output[0] = np.power(10,output[0])
+	output[1] = np.power(10,output[1])
+	return output	
 
 def LuminosityFunction(luminosityParameter,luminosity):
 	return luminosityParameter[0]*float(mpmath.gammainc(luminosityParameter[2]+1,luminosity/luminosityParameter[1]))
@@ -54,7 +68,7 @@ def CalibrationHa(z,oldLum,it):
 	newLF = np.array([[0.for i in range(interpolatingSize)] for i in range(interpolatingSize)])
 	for i in range(interpolatingSize):
 		for j in range(interpolatingSize):
-	       	 newLF[i][j]= optimize.brenth(rootfinding,30,50,args=(luminosityParameter(grid[1][i]),np.power(10,grid[0][j])))
+	       	 newLF[i][j]= optimize.brenth(rootfinding,30,50,args=(luminosityParameterHa(grid[1][i]),np.power(10,grid[0][j])))
 	localinterp = interpolate.interp2d(grid[0],grid[1],newLF,fill_value=0.0)
 	for i in range(oldLF.size):
 		newLum[i]=float(localinterp(np.log10(oldLF[i]),z[it[i]]))
@@ -81,7 +95,7 @@ def CalibrationO3b(z,oldLum,it):
 	newLF = np.array([[0.for i in range(interpolatingSize)] for i in range(interpolatingSize)])
 	for i in range(interpolatingSize):
 		for j in range(interpolatingSize):
-	      	  newLF[i][j]= optimize.brenth(rootfinding,30,50,args=(luminosityParameter(grid[1][i]),np.power(10,grid[0][j])))
+	      	  newLF[i][j]= optimize.brenth(rootfinding,30,50,args=(luminosityParameterO3b(grid[1][i]),np.power(10,grid[0][j])))
 	localinterp = interpolate.interp2d(grid[0],grid[1],newLF,fill_value=0.0)
 	for i in range(oldLF.size):
 		newLum[i]=float(localinterp(np.log10(oldLF[i]),z[it[i]]))

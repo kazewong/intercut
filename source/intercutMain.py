@@ -102,8 +102,8 @@ dl =np.array(10.**(0.2*dmz[it]+1)*3.09e18,dtype = 'float64')
 lumHa = lineDict['Ha'].flux[it]*4*pi*dl**2
 lumO3a = lineDict['OIIIa'].flux[it]*4*pi*dl**2
 lumO3b = lineDict['OIIIb'].flux[it]*4*pi*dl**2
-lumHa2 = np.array(CalibrationHa(z,lumHa,it))
-lumO3b2 = np.array(CalibrationO3b(z,lumO3b,it))
+lumHa2 = np.array(CalibrationHa((1+z)*lineDict['OII']/lineDict['Ha']-1,lumHa,it))
+lumO3b2 = np.array(CalibrationO3b((1+z)*lineDict['OII']/lineDict['OIIIb']-1,lumO3b,it))
 lineDict['Ha'].flux =  np.array([-9999. for x in range(z.size)])
 lineDict['OIIIb'].flux =  np.array([-9999. for x in range(z.size)])
 lineDict['Ha'].flux[it] = lumHa2.astype('float64')/(4.*pi*dl**2.) 
