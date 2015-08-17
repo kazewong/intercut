@@ -102,8 +102,8 @@ dl =np.array(10.**(0.2*dmz[it]+1)*3.09e18,dtype = 'float64')
 lumHa = lineDict['Ha'].flux[it]*4*pi*dl**2
 lumO3a = lineDict['OIIIa'].flux[it]*4*pi*dl**2
 lumO3b = lineDict['OIIIb'].flux[it]*4*pi*dl**2
-lumHa2 = np.array(CalibrationHa((1+z)*lineDict['OII']/lineDict['Ha']-1,lumHa,it))
-lumO3b2 = np.array(CalibrationO3b((1+z)*lineDict['OII']/lineDict['OIIIb']-1,lumO3b,it))
+lumHa2 = np.array(CalibrationHa((1+z)*lineDict['OII'].wavelength/lineDict['Ha'].wavelength-1,lumHa,it))
+lumO3b2 = np.array(CalibrationO3b((1+z)*lineDict['OII'].wavelength/lineDict['OIIIb'].wavelength-1,lumO3b,it))
 lineDict['Ha'].flux =  np.array([-9999. for x in range(z.size)])
 lineDict['OIIIb'].flux =  np.array([-9999. for x in range(z.size)])
 lineDict['Ha'].flux[it] = lumHa2.astype('float64')/(4.*pi*dl**2.) 
@@ -148,12 +148,13 @@ for i in range(parameter[0]):
 #this part evaluates the second line cutting condition and return the result as histogram
 
 	secondLineCutting(lineDict,field)
-	getFraction(lineDict,'OII',z,(1,2))
+	getFraction(lineDict,'OII',z,(parameter[2],parameter[3]),bin=parameter[1])
 
 for lineObject in lineDict:
 	lineDict[lineObject].fraction = np.array(lineDict[lineObject].fraction)
-	lineDict[lineObject].fraction = lineDict[lineObject].fraction.reshape(lineDict[lineObject].fraction.size/parameter[1],parameter[1])
-	lineDict[lineObject].getStat()
+	lineDict[lineObject].fraction = lineDict[lineObject].fraction.reshape(lineDict[lineObject].fraction.size/parameter[1],parameter[1]).T
+	
+getStat(lineDict)
 
 #*************************************END OF SECOND LINE IDENTIFICATION SECTION******************************
 

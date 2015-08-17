@@ -47,3 +47,15 @@ def getFraction(lines,mainLineName,z,ranges,bin = 10):
 			hlocal = np.array(np.histogram(0,bins =bin,range = ranges)[0])
 		lines[lineObject].fraction = np.append(lines[lineObject].fraction,np.divide(hlocal,hmain))
 		
+def getStat(lines):
+	fractionAll = np.array([[0. for i in range(lines.items()[0][1].fraction.shape[1])] for i in range(lines.items()[0][1].fraction.shape[0])])
+	for line in lines:
+		fractionAll = fractionAll + lines[line].fraction
+		lines[line].mean = np.array([0. for i in range(lines.items()[0][1].fraction.shape[0])])
+		lines[line].sd = np.array([0. for i in range(lines.items()[0][1].fraction.shape[0])])
+	for line in lines:
+		local = np.divide(lines[line].fraction,fractionAll)
+		for bin in range(lines[line].fraction.shape[0]):
+			lines[line].mean[bin] = np.mean(local[bin])
+			lines[line].sd[bin] = np.std(local[bin])
+	

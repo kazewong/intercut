@@ -27,14 +27,13 @@ class line:
 		self.intf = np.append(self.intf,leftover)
 		self.intf.sort() 
 		
-	def getStat(self):
-		self.fraction = self.fraction.T
+	def getStatForCutperformence(self):
 		self.mean = np.array([0. for i in range(self.fraction.shape[0])])
 		self.sd = np.array([0. for i in range(self.fraction.shape[0])])
-		self.fraction = np.divide(self.fraction,(self.fraction+1.))
+		local = np.divide(self.fraction,(self.fraction+1.))
 		for i in range(self.fraction.shape[0]):
-			self.mean[i] = np.mean(self.fraction[i])
-			self.sd[i] = np.std(self.fraction[i])
+			self.mean[i] = np.mean(local[i])
+			self.sd[i] = np.std(local[i])
 	
 	
 class photocut:
