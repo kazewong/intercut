@@ -23,8 +23,18 @@ class line:
 
 	def conditionalSelection(self,condition,selection):
 		leftover = np.intersect1d(self.intf,np.where(condition*selection)[0])
-		self.intf = np.intersect1d(self.intf,np.where(~(condition))[0])
+		print 'condition size is '
+		print np.where(condition)[0].size
+		print 'selection size is '
+		print np.where(selection)[0].size
+		print 'total size is '
+		print np.where(condition*selection)[0].size
+		print 'leftover size is '
+		print leftover.size
+		self.intf = np.intersect1d(self.intf,np.where(~condition)[0])
+		print self.intf.size
 		self.intf = np.append(self.intf,leftover)
+		print self.intf.size
 		self.intf.sort() 
 		
 	def getStatForCutperformence(self):
@@ -37,10 +47,11 @@ class line:
 	
 	
 class photocut:
-	def __init__(self,name,dep):
+	def __init__(self,name,dep,r0):
 		self.name = name
 		self.dep = dep
 		self.err = np.power(10,(-0.4*(self.dep-23.9)))*1.e-29*0.2*2
+		self.r0 = r0
 	flux = np.array([],dtype=float)
 	origin = np.array([],dtype=float)
 	mag = np.array([],dtype=float)
