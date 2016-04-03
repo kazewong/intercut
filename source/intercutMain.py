@@ -17,6 +17,7 @@ flux = np.array([])
 noise = np.array([])
 photocut = ''
 mainline = ''
+cuttype= ''
 
 flags = [1,1]# the first flag is radial noise,second is random fluctuation
 #***********************************IO SECTION********************************
@@ -72,6 +73,8 @@ for linenumber in range(fileio.size/fileio.ndim):
 		flags = eval(fileio[linenumber][1])
 	if fileio[linenumber][0] == 'mainline':
 		mainline = lineDict[fileio[linenumber][1]].name 
+	if fileio[linenumber][0] == 'cuttype':
+		cuttype = fileio[linenumber][1]
 
 if flags[0] ==1:
 	for object in field:
@@ -239,8 +242,8 @@ for lineObject in lineDict:
 	lineDict[lineObject].fraction = np.array(lineDict[lineObject].fraction)
 	lineDict[lineObject].fraction = lineDict[lineObject].fraction.reshape(lineDict[lineObject].fraction.size/parameter[1],parameter[1]).T
 	
-getTotalIntf(lineDict)
-#getSelfIntf(lineDict,"Ha")
+if cuttype == 'total':getTotalIntf(lineDict)
+else:getSelfIntf(lineDict,mainline)
 #*************************************END OF SECOND LINE IDENTIFICATION SECTION******************************
 
 #***********************************************PLOTTING SECTION*********************************************
