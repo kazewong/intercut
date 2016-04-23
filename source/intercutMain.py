@@ -149,24 +149,38 @@ for i in range(oldpara.shape[0]):
         oldLF[i] = LF.LuminosityFunction(oldpara[i],lumHa[i])
 grid = np.array([[0. for i in range(interpolatingSize)] for i in range(2)])
 mpgrid = mpmath.arange(oldLF[oldLF<-5].max(),oldLF.max(),(oldLF.max()-oldLF[oldLF<-5].max())/interpolatingSize)
-grid[0] = np.ogrid[oldLF.min():oldLF.max():interpolatingSize*1j]
 grid[1] = np.ogrid[0:6:interpolatingSize*1j]
 newLF = np.array([[0.for i in range(interpolatingSize)] for i in range(interpolatingSize)])
 for i in range(interpolatingSize):
 	for j in range(interpolatingSize):
 		newLF[i][j]= optimize.brentq(LF.rootfinding,1e30,1e50,args=(LF.luminosityParameterHa(grid[1][i]),mpgrid[j]))
-newLum = interpolate.interpn([grid[1],mpgrid],newLF,np.array([z[it],oldLF]).T,bounds_error=False,fill_value=0.0)
+newLum = interpolate.interpn([grid[1],mpgrid],newLF,np.array([(z[it]+1)*(lineDict[mainline].wavelength/6563.)-1,oldLF]).T,bounds_error=False,fill_value=0.0)
 for i in np.where(oldLF<-5)[0]:
-	newLum[i] = optimize.brentq(LF.rootfinding,1e30,1e50,args=(LF.luminosityParameterHa(z[it][i]),oldLF[i]))
+	newLum[i] = optimize.brentq(LF.rootfinding,1e30,1e50,args=(LF.luminosityParameterHa((z[it][i]+1)*(lineDict[mainline].wavelength/6563.)-1),oldLF[i]))
 	
 for i in range(it.shape[0]):
         lineDict["Ha"].flux[it[i]] = (newLum[i]/(4*pi*(dl[i]**2)))
+        
+newLumO3b = [0. for x in range((it.shape[0]))]
+grid = np.array([[0. for i in range(interpolatingSize)] for i in range(2)])
+mpgrid = mpmath.linspace(oldLF[oldLF<-2.7].max(),oldLF.max(),interpolatingSize)
+grid[1] = np.ogrid[0:6:interpolatingSize*1j]
+newLF = np.array([[0.for i in range(interpolatingSize)] for i in range(interpolatingSize)])
+for i in range(interpolatingSize):
+	for j in range(interpolatingSize):
+		newLF[i][j]= optimize.brentq(LF.rootfinding,1e30,1e50,args=(LF.luminosityParameterO3b(grid[1][i]),mpgrid[j]))
+newLumO3b = interpolate.interpn([grid[1],mpgrid],newLF,np.array([(z[it]+1)*(lineDict[mainline].wavelength/6563.)-1,oldLF]).T,bounds_error=False,fill_value=0.0)
+for i in np.where(oldLF<-2.7)[0]:
+	newLumO3b[i] = optimize.brentq(LF.rootfinding,1e30,1e50,args=(LF.luminosityParameterO3b((z[it][i]+1)*(lineDict[mainline].wavelength/5007.)-1),oldLF[i]))
 	
+for i in range(it.shape[0]):
+        lineDict["OIIIb"].flux[it[i]] = (newLumO3b[i]/(4*pi*(dl[i]**2)))	
+
 # logl1 = 35 +np.arange(134.)*0.1
 # y = np.genfromtxt('shiftl_ha_colbert.dat')
-# lumHa2 = [0 for x in range((it[0].size/it[0].ndim))]
-# for i in range((it[0].size/it[0].ndim)-1):	
-#         iz = int(np.around(10*z[it[0][i]]))
+# lumHa2 = [0 for x in range((it.shape[0]))]
+# for i in range((it.shape[0])-1):	
+#         iz = int(np.around(10*z[it[i]]))
 # 
 #         if iz <= 60:
 #                         lumHa2[i] = np.interp(np.log10(lumHa[i]),logl1,y[iz])     
@@ -178,32 +192,35 @@ for i in range(it.shape[0]):
 #         lumHa2[i] = 10.**lumHa2[i]
 # lineDict["Ha"].flux = [-9999 for x in range((z.size/z.ndim))]
 # 
-# for i in range((it[0].size/it[0].ndim-1)):
-#         lineDict["Ha"].flux[it[0][i]] = (lumHa2[i]/(4*pi*(dl[i]**2)))
+# for i in range(it.shape[0]):
+#         lineDict["Ha"].flux[it[i]] = (lumHa2[i]/(4*pi*(dl[i]**2)))
+# 
+# 
+# logl1 = 34 +np.arange(141.)*0.1
+# y = np.genfromtxt('shiftl_o3_colbert_ha_geach.dat')
+# lumO3b2 = [0 for x in range((it.shape[0]))]
+# 
+# for i in range(it.shape[0]):	
+#         iz = int(np.around(10*z[it[i]]))
+#         if iz <= 60:
+#                         lumO3b2[i] = np.interp(np.log10(lumHa[i]),logl1,y[iz])
+#         else:
+#                         lumO3b2[i] = np.log10(lumO3b[i])
+# 
+# for i in range(0,len(lumO3b2)):
+#         lumO3b2[i] = 10.**lumO3b2[i]
+# lineDict["OIIIb"].flux = [-9999 for x in range((z.size/z.ndim))]
+# for i in range((it.shape[0])):
+#         lineDict["OIIIb"].flux[it[i]] = lumO3b2[i]/(4*pi*(dl[i]**2))
+# 
 
-
-logl1 = 34 +np.arange(141.)*0.1
-y = np.genfromtxt('shiftl_o3_colbert_ha_geach.dat')
-lumO3b2 = [0 for x in range((it.shape[0]))]
-
-for i in range(it.shape[0]):	
-        iz = int(np.around(10*z[it[i]]))
-        if iz <= 60:
-                        lumO3b2[i] = np.interp(np.log10(lumHa[i]),logl1,y[iz])
-        else:
-                        lumO3b2[i] = np.log10(lumO3b[i])
-
-for i in range(0,len(lumO3b2)):
-        lumO3b2[i] = 10.**lumO3b2[i]
-lineDict["OIIIb"].flux = [-9999 for x in range((z.size/z.ndim))]
-for i in range((it.shape[0])):
-        lineDict["OIIIb"].flux[it[i]] = lumO3b2[i]/(4*pi*(dl[i]**2))
 
 kO3b=4.05+2.659*(-2.156+1.509/.5007-0.198/(.5007**2)+0.011/(.5007**3))
 kO3a=4.05+2.659*(-2.156+1.509/.4959-0.198/(.4959**2)+0.011/(.4959**3))
 
 for i in range (len(lineDict["OIIIb"].flux)):
         lineDict["OIIIa"].flux[i]=((lineDict["OIIIb"].flux[i]*(10.**(0.4*ebv[i]*kO3b))/3.)*(10.**(-0.4*ebv[i]*kO3a)))
+
 
 #****************************RANDOM FLUCTUATION SECTION**********************
 #this section perturb the flux of the spectral lines and photometric cut

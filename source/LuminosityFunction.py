@@ -29,8 +29,8 @@ def luminosityParameterHa(z):
 	return output
 	
 def luminosityParameterO3b(z):
-	bin1 = np.array([[0.9],[-3.28,42.39,-1.5]])
-	bin2 = np.array([[1.8],[-3.60,42.83,-1.5]])
+	bin1 = np.array([[1.1],[-3.28,42.39,-1.5]])
+	bin2 = np.array([[1.9],[-3.60,42.83,-1.5]])
 	output = np.array([[0. for i in range(z.size)] for i in range(3)])
 	binsize = bin2[0][0] - bin1[0][0]
 	for i in range(3):
