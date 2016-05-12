@@ -1,0 +1,11 @@
+To test the program, put the following file under the same directory:
+
+conditionWFIRSTOIIIcuts.dat
+fileioWFIRST.dat
+noisewfirst2.dat
+CuttingFunction.py
+LuminosityFunction.py
+intercutMain.py
+lineCLass.py
+
+and run the following command : python intercutMain.py
