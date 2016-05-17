@@ -5,6 +5,7 @@ from scipy import optimize
 from scipy import interpolate
 import mpmath
 
+print 'Program start, reading data in'
 cata = fits.open('CMC081211_all.fits')
 table = cata[1].data
 z=table.field(3)
@@ -18,8 +19,8 @@ dl=np.array(10.**(0.2*dmz[it]+1)*3.09e18,dtype='float64')
 lumHa = Ha[it]*4*np.pi*dl**2
 lumO3a = OIIIa[it]*4*np.pi*dl**2
 lumO3b = OIIIb[it]*4*np.pi*dl**2
-mainline = 'OIIIb'
 
+print 'Calibrating Ha line'
 newLum = [0. for x in range((it.shape[0]))]
 oldpara = np.array([[0. for i in range(3)] for i in range(it.shape[0])])
 oldLF = np.array([0. for i in range(it.shape[0])])
@@ -43,8 +44,9 @@ for i in np.where(oldLF<-5)[0]:
 	newLum[i] = optimize.brentq(LF.rootfinding,1e30,1e50,args=(LF.luminosityParameterHa(z[it][i]),oldLF[i]))
 z=(z+1)*(6563./5007.)-1
 
-Ha = (newLum/(4*np.pi*(dl**2)))
+Ha[it] = (newLum/(4*np.pi*(dl**2)))
         
+print 'Calibrating OIIIb line'
 newLumO3b = [0. for x in range((it.shape[0]))]
 grid = np.array([[0. for i in range(interpolatingSize)] for i in range(2)])
 mpgrid = mpmath.linspace(oldLF[oldLF<-2.7].max(),oldLF.max(),interpolatingSize)
@@ -53,13 +55,16 @@ newLF = np.array([[0.for i in range(interpolatingSize)] for i in range(interpola
 for i in range(interpolatingSize):
 	for j in range(interpolatingSize):
 		newLF[i][j]= optimize.brentq(LF.rootfinding,1e30,1e50,args=(LF.luminosityParameterO3b(grid[1][i]),mpgrid[j]))
-z=(z+1)*(5007./5007.)-1
+z=(z+1)*(5007./6563.)-1
 newLumO3b = interpolate.interpn([grid[1],mpgrid],newLF,np.array([z[it],oldLF]).T,bounds_error=False,fill_value=0.0)
 for i in np.where(oldLF<-2.7)[0]:
 	newLumO3b[i] = optimize.brentq(LF.rootfinding,1e30,1e50,args=(LF.luminosityParameterO3b(z[it][i]),oldLF[i]))
-z=(z+1)*(5007./5007.)-1
+z=(z+1)*(6563./5007.)-1
 
 OIIIb[it] = (newLumO3b/(4*np.pi*(dl**2)))
-        
-np.savetxt('CalibratedHa.LF',lumHa)
-np.savetxt('CalibratedO3b.LF',lumO3b)
+     
+print 'Writing data into fits file'
+table['Flux_Ha'] = Ha
+table['Flux_OIIIb'] = OIIIb
+cata.writeto('CMCCalibrated.fits')
+print 'Program ends'
