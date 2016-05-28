@@ -23,18 +23,8 @@ class line:
 
 	def conditionalSelection(self,condition,selection):
 		leftover = np.intersect1d(self.intf,np.where(condition*selection)[0])
-		print 'condition size is '
-		print np.where(condition)[0].size
-		print 'selection size is '
-		print np.where(selection)[0].size
-		print 'total size is '
-		print np.where(condition*selection)[0].size
-		print 'leftover size is '
-		print leftover.size
 		self.intf = np.intersect1d(self.intf,np.where(~condition)[0])
-		print self.intf.size
 		self.intf = np.append(self.intf,leftover)
-		print self.intf.size
 		self.intf.sort() 
 		
 	def getStatForCutperformence(self):

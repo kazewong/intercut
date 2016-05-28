@@ -21,7 +21,6 @@ def secondLineCutting(lines,field):
 	zd = np.array([0.0 for i in range(z.size)])
 	wavelength = float
 	for lineObject in lines:
-		print 'cutting '+ lines[lineObject].name+' line, '+str(lines[lineObject].condition.size)+' condition found.'
 		for lineObjectCondition in lines[lineObject].condition:
 			flux = lines[eval(lineObjectCondition)[1]].flux
 			noise = lines[eval(lineObjectCondition)[1]].noise
@@ -30,7 +29,6 @@ def secondLineCutting(lines,field):
 			if eval(lineObjectCondition)[0] == 'normal':
 				lines[lineObject].selection(eval(lineObjectCondition)[2])
 			if eval(lineObjectCondition)[0] == 'conditional':
-				print zd[0:10]
 				lines[lineObject].conditionalSelection(eval(lineObjectCondition)[2],eval(lineObjectCondition)[3])
 
 def lineFluxPertubation(lines,threshold):
@@ -40,13 +38,10 @@ def lineFluxPertubation(lines,threshold):
 		
 def getFraction(lines,mainLineName,z,ranges,bin = 10):
 	mainLine = lines[mainLineName]
-	print mainLine.name, mainLine.intf
 	hmain = np.array(np.histogram(z[mainLine.intf],bins = bin,range = ranges)[0],dtype = float)
-	print mainLine.name,hmain
 	for lineObject in lines:
 		if lines[lineObject] !=[]:
 			hlocal = np.array(np.histogram((lines[lineObject].wavelength/mainLine.wavelength)*(1+(z[lines[lineObject].intf]))-1,bins = bin,range = ranges)[0])
-			print lines[lineObject].name,hlocal
 		else:
 			hlocal = np.array(np.histogram(0,bins =bin,range = ranges)[0])
 		lines[lineObject].fraction = np.append(lines[lineObject].fraction,np.divide(hlocal,hmain))
