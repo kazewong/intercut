@@ -113,8 +113,9 @@ print 'the entries number is '+str(z.size)
 #****************************************CALIBRATING SECTION********************************
 #this part calibrate the catalogue 'CMC081211',only Ha,O3a and O3b need calibration 
 
-lineDict["Ha"].flux = np.genfromtxt('CalibratedHa.LF')
-lineDict["OIIIb"].flux = np.genfromtxt('CalibratedO3b.LF')
+#If using calibrated catalog, no need for this two line
+#lineDict["Ha"].flux = np.genfromtxt('CalibratedHa.LF')
+#lineDict["OIIIb"].flux = np.genfromtxt('CalibratedO3b.LF')
 kO3b=4.05+2.659*(-2.156+1.509/.5007-0.198/(.5007**2)+0.011/(.5007**3))
 kO3a=4.05+2.659*(-2.156+1.509/.4959-0.198/(.4959**2)+0.011/(.4959**3))
 

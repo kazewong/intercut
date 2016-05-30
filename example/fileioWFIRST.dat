@@ -1,5 +1,5 @@
 flags;[1,1]
-catalog;CMC081211_all.fits
+catalog;CMCCalibrated.fits
 noise;noisewfirst2.dat
 output;outputWFIRSTOIIIbcutsTotal.dat
 loopNumber;100
