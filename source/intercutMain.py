@@ -170,6 +170,7 @@ else:getSelfIntf(lineDict,mainline)
 
 #***********************************************PLOTTING SECTION*********************************************
 output = open(outputname,'w')
+output.write('The redshift of bins are '+str(np.linspace(parameter[2],parameter[3],parameter[1])+'\n'))
 for i in lineDict:
 	output.write(lineDict[i].name+'\n')
 	for j in range(parameter[1]):
