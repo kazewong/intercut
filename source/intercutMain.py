@@ -8,6 +8,7 @@ import LuminosityFunction as LF
 import mpmath
 from CuttingFunction import *
 
+print 'Program start, reading input files..........'
 fileio = np.genfromtxt('fileioWFIRST.dat',dtype = "S200",delimiter = ';')
 field = []
 lineDict={}
@@ -78,7 +79,10 @@ for linenumber in range(fileio.size/fileio.ndim):
 
 if flags[0] ==1:
 	for object in field:
-		object.dep = np.array(object.dep-1.25*np.log10(1+np.power((radius/object.r0),2)))
+		if object.dep != 0:
+			object.dep = np.array(object.dep-1.25*np.log10(1+np.power((radius/object.r0),2)))
+		else:
+			object.dep = np.array([object.dep for i in range(object.mag.size)])
 		object.err = np.power(10,(-0.4*(object.dep-23.9)))*1.e-29*0.2	
 else:
 	for object in field:
@@ -106,14 +110,13 @@ for line in lineDict:
 #lineDict['OII'].noise = np.interp(lineDict['OII'].wavelength*(1+z),O2noise[0],O2noise[1])
 	
 #*****************************END OF IO SECTION**************************************
-print 'the output file is going to be '+str(outputname)
-print 'the simulation number is '+str(parameter[0])
-print 'the lines input are ' + str(len(lineDict))
-print 'the entries number is '+str(z.size)
+print 'The output file is going to be '+str(outputname)
+print 'The simulation number is '+str(parameter[0])
+print str(len(lineDict)) + ' interloping emission line are considered'
+print str(z.size) + ' galaxies read'
 #****************************************CALIBRATING SECTION********************************
 #this part calibrate the catalogue 'CMC081211',only Ha,O3a and O3b need calibration 
 
-# No need for these two lines if using Calibrated Catalog
 #lineDict["Ha"].flux = np.genfromtxt('CalibratedHa.LF')
 #lineDict["OIIIb"].flux = np.genfromtxt('CalibratedO3b.LF')
 kO3b=4.05+2.659*(-2.156+1.509/.5007-0.198/(.5007**2)+0.011/(.5007**3))
@@ -131,9 +134,9 @@ for i in lineDict:
 	
 fcut = np.power(10.,-0.4*(56.+1.+48.6))
 
+print 'Simulation Start..........'
 
 for i in range(parameter[0]):
-	print 'the loop number is '+str(i)
 	for lineObject in lineDict:
 		lineDict[lineObject].flux = lineDict[lineObject].origin.copy()
 		lineDict[lineObject].intf = np.arange(lineDict[lineObject].flux.size)
@@ -156,6 +159,7 @@ for i in range(parameter[0]):
 	secondLineCutting(lineDict,field)
 	getFraction(lineDict,mainline,z,(parameter[2],parameter[3]),bin=parameter[1])
 
+print 'Writing result to output file..........'
 for lineObject in lineDict:
 	lineDict[lineObject].fraction = np.array(lineDict[lineObject].fraction)
 	lineDict[lineObject].fraction = lineDict[lineObject].fraction.reshape(lineDict[lineObject].fraction.size/parameter[1],parameter[1]).T

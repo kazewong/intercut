@@ -39,6 +39,7 @@ def lineFluxPertubation(lines,threshold):
 def getFraction(lines,mainLineName,z,ranges,bin = 10):
 	mainLine = lines[mainLineName]
 	hmain = np.array(np.histogram(z[mainLine.intf],bins = bin,range = ranges)[0],dtype = float)
+	hmain[np.where(hmain==0)] = -1
 	for lineObject in lines:
 		if lines[lineObject] !=[]:
 			hlocal = np.array(np.histogram((lines[lineObject].wavelength/mainLine.wavelength)*(1+(z[lines[lineObject].intf]))-1,bins = bin,range = ranges)[0])
@@ -52,6 +53,7 @@ def getTotalIntf(lines):
 		fractionAll = fractionAll + lines[line].fraction
 		lines[line].mean = np.array([0. for i in range(lines.items()[0][1].fraction.shape[0])])
 		lines[line].sd = np.array([0. for i in range(lines.items()[0][1].fraction.shape[0])])
+	fractionAll[np.where(fractionAll==0)] = -1
 	for line in lines:
 		local = np.divide(lines[line].fraction,fractionAll)
 		for bin in range(lines[line].fraction.shape[0]):
